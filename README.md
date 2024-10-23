@@ -57,7 +57,7 @@ Secondly, we provide an integer programming (IP) formulation for the vector quan
 
 ### Installation
 
-`git clone https://github.com/github_username/repo_name.git`
+`git clone https://github.com/MateiCosa/vector-quantization.git`
 
 ### Usage
 
