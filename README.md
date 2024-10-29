@@ -99,7 +99,7 @@ The most important implementation trick is noticing that that an image described
 ### Data
 
 Let $\mathcal{I} := \{1, \dots, p\}$. Each data point $x^i$, with $i \in \mathcal{I}$, belongs to $R^3$ (i.e. $n = 3$), with each component representing a value for one of the three \textit{RGB channels}. Consider the set $S$ of all possible clusters and let $c^j \in \mathbb{R}^n$ be their associated centers, with $j \in \mathcal{J} = \{1, \dots, |S|\}$. Given that the output should correspond to another RGB image, we may round the optimal centers in order to obtain tuples of 3 bytes representing the value of the red, green, and blue channels for the final solution.\\
-Let us then introduce the matrix $D \in \mathbb{R}^{p \times m}$, where $m := |\mathcal{J}|$. For every $i \in \mathcal{I}$ and for every $j \in \mathcal{J}$, we define $(D)_{i,j} := d_{ij} = \left\lVert x^i - c^j \right\rVert_2^2$, i.e. the squared distance from point $x^i$ to center $c^j$.
+Let us then introduce the matrix $D \in \mathbb{R}^{p \times m}$, where $m := |\mathcal{J}|$. For every $i \in \mathcal{I}$ and for every $j \in \mathcal{J}$, we define $D_{i,j} := d_{ij} = \left\lVert x^i - c^j \right\rVert_2^2 $, i.e. the squared distance from point $x^i$ to center $c^j$.
 
 ### Variables
 
