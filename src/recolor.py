@@ -73,7 +73,7 @@ class Lloyd():
             points_from_cluster = (self.clusters == i)
             if points_from_cluster.sum():
                 cluster_ids = self.id_range[points_from_cluster]
-                new_centers[i] = np.sum(self.unique_col_tensor[cluster_ids] * self.unique_col_counts[cluster_ids][:, np.newaxis], axis=0) // np.sum(self.unique_col_counts[cluster_ids])
+                new_centers[i] = np.sum(self.unique_col_tensor[cluster_ids] * self.unique_col_counts[cluster_ids][:, np.newaxis], axis=0) / np.sum(self.unique_col_counts[cluster_ids])
             else:
                 new_centers[i] = self.unique_col_tensor[np.random.choice(self.n, 1)]
         if in_place:

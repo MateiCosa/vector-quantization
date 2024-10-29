@@ -26,7 +26,7 @@ def create_data_file(img, k):
 
     unique_col_tensor = img.get_unique_col_tensor()
     power = np.full(3, 2)
-    dist = np.zeros((n, m), dtype=int)
+    dist = np.zeros((n, m))
     for j, center in enumerate(centers):
         dist[:, j] = np.sum((unique_col_tensor - center) ** power, axis=1)
 
@@ -60,10 +60,10 @@ if __name__ == "__main__":
 
     img = ImgData(input_file, input_file[:-4] + "output.png")
 
-    thresh_gen = Threshold_Generator(img, 8)
+    thresh_gen = Threshold_Generator(img, k)
     thresh_gen.run()
 
-    simplifier = Simplifier(img, 8, thresh_gen.get_threshold())   
+    simplifier = Simplifier(img, k, thresh_gen.get_threshold())
     simplifier.run()
 
     create_data_file(img, k)

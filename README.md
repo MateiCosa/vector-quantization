@@ -5,6 +5,8 @@
     <img src="./data/img/yoda_output.png" alt = "Yoda Output" width=30% height=30%>
 </p>
 
+*"Reduce the number of colors, you must!"*
+
 ## Scope
 
 Vector quantization refers to the problem of reducing the memory required to store data by transforming it into a representation which preserves the original information as well as possible. A classic application of this teqchnique is color compression for *RGB images*. In this setting, one is given an image for which each pixel is described by three $8$-bit channels corresponding to red, green, and blue values ranging from $0$ to $255$. Clearly, this requires a total of 24 bits to represent at most $2^{24}$ possible color values. For most images, allocating this much memory is wasteful, as the number of colors actually present is much lower and not all colors are necessary to give a reasonable description of the image. For this reason, we would like to assign each pixel a smaller number of bits (e.g., 3, 8, etc.), thereby yielding an image with potentionally fewer colors that is *"as similar"* as possible to the input image.
@@ -25,8 +27,8 @@ Secondly, we provide an integer programming (IP) formulation for the vector quan
 * notebook: folder containing a jupyter notebook;
   * results.ipynb: notebook containing the detailed analysis and results breakdown.
 * lp: folder containing model, data, and output files for linear integer programming;
-  * model.mod: glpk IP model;
-  * data.dat: glpk IP data file;
+  * model.mod: GLPK IP model;
+  * data.dat: GLPK IP data file;
   * objective_value.csv: resulting optimal objective function value;
   * selected_centers.csv: resulting centers selected in the optimal solution;
   * cluster_assignments.csv: resulting assignment of unique data points to selected centers.
@@ -72,6 +74,7 @@ To construct the GLPK data file, run:
 To solve the IP with GLPK, run:
 
 `cd lp`
+
 `glpsol --model model.mod --data data.dat`
 
 Resulting output images will be stored under **data/img**, while resulting IP files (i.e., optimal objective function value, centroids, assignment) will be stored under **lp**.
@@ -95,14 +98,12 @@ The most important implementation trick is noticing that that an image described
 
 ### Data
 
-Let $\mathcal{I} := \\{1, \dots, p\\}$. Each data point $x^i$, with $i \in \mathcal{I}$, belongs to $R^3$ (i.e. $n = 3$), with each component representing a value for one of the three *RGB channels*. We observe that each center $c^j$ must also correspond to an *RGB value*, i.e. a tuple of 3 bytes representing the value of the red, green, and blue channels. While in the general problem formulation $c^j$ can be any element of $\mathbb{R}^n$, our restricted setting allows us to identify the set of possible centers with the set $\mathcal{J} := \\{j : j = 0, 1, \dots, 2^{24}-1\\}$. Indeed, given an integer $j \in \mathcal{J}$ in binary representation, the number represented by each byte corresponds to the red, green, and blue values. Therefore, given the binary representation $j_2 = (b_{27} \dots b_{20})(b_{17} \dots b_{10})(b_{07} \dots b_{00})$, we define $c_j := ((b_{27} \dots b_{20}), (b_{17} \dots b_{10}), (b_{07} \dots b_{00})) \in \mathbb{R}^3$ for all $j \in \mathcal{J}$. 
-
-Let us then introduce the matrix $D \in \mathbb{R}^{n \times m}$, where $m := |\mathcal{J}| = 2^{24}$. For every $i \in \mathcal{I}$ and for every $j \in \mathcal{J}$, we define $D_{i,j} := d_{ij} = \left\lVert x^i - c^j \right\rVert_2^2$, i.e. the distance from point $x^i$ to center $c^j$.
+Let $\mathcal{I} := \{1, \dots, p\}$. Each data point $x^i$, with $i \in \mathcal{I}$, belongs to $R^3$ (i.e. $n = 3$), with each component representing a value for one of the three \textit{RGB channels}. Consider the set $S$ of all possible clusters and let $c^j \in \mathbb{R}^n$ be their associated centers, with $j \in \mathcal{J} = \{1, \dots, |S|\}$. Given that the output should correspond to another RGB image, we may round the optimal centers in order to obtain tuples of 3 bytes representing the value of the red, green, and blue channels for the final solution.\\
+Let us then introduce the matrix $D \in \mathbb{R}^{p \times m}$, where $m := |\mathcal{J}|$. For every $i \in \mathcal{I}$ and for every $j \in \mathcal{J}$, we define $(D)_{i,j} := d_{ij} = \left\lVert x^i - c^j \right\rVert_2^2$, i.e. the squared distance from point $x^i$ to center $c^j$.
 
 ### Variables
 
-We introduce binary variables $y_j$, with $j \in \mathcal{J}$, such that $y_j = 1$ if and only if $c^j$ is one of the $k$ selected centers. Moreover, we introduce binary variables $z_{ij}$, with $i \in \mathcal{I}$ and $j \in \mathcal{J}$, such that $z_{ij} = 1$ if and only if $x^i$ is assigned to the cluster formed around the center $c^j$. This yields a total number of variables equal to $m(p + 1) = 2^{24}(p + 1)$.
-
+We introduce binary variables $y_j$, with $j \in \mathcal{J}$, such that $y_j = 1$ if and only if $c^j$ is one of the $k$ selected centers. Moreover, we introduce binary variables $z_{ij}$, with $i \in \mathcal{I}$ and $j \in \mathcal{J}$, such that $z_{ij} = 1$ if and only if $x^i$ is assigned to the cluster formed around the center $c^j$. This yields a total number of variables equal to $m(p + 1)$. Note that $m$ may be exponentially large as function of $p$. For this reason, we will provide an appropriate model in theory, and then modify it in order to make it work in practice.
 ### Model
 
 Using the data and the variables introduced in the previous sections, we are ready to formulate our problem as an Integer Program (IP) in the following way:

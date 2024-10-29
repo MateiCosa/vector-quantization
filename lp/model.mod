@@ -53,4 +53,6 @@ table tbl_centers{j in SelectedCenters} OUT "CSV" "selected_centers.csv": j;
 param objective_value := sum{i in I, j in J} d[i, j] * c[i] * z[i, j];
 printf "Optimal Objective Value: %f\n", objective_value > "objective_value.csv";
 
+printf "Optimal Objective Value: %f\n", objective_value;
+
 end;
